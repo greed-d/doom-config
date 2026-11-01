@@ -1,0 +1,6 @@
+# Byte-compiled / native-compiled artifacts
+*.elc
+eln-cache/
+
+# Local Doom state
+.local/
