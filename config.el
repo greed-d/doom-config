@@ -89,6 +89,33 @@
         treemacs-width 35))
 
 ;; Toggle the file tree with `SPC \` instead of `SPC o p`.
+;; (map! :leader
+;;       :desc "Toggle file tree" "\\" #'+treemacs/toggle
+;;       "o p" nil)
+
+;;; Gitsigns-like VC gutter (diff-hl)
+;; Show git changes in a sign column (margin) instead of the fringe, using
+;; gitsigns-style marker glyphs.
+(after! diff-hl
+  (require 'diff-hl-margin)
+  (setq diff-hl-margin-symbols-alist
+        '((insert    . "▎")
+          (change    . "▎")
+          (delete    . "")
+          (unknown   . "?")
+          (ignored   . "i")
+          (reference . " ")))
+  (diff-hl-margin-mode +1))
+
+;; Hunk actions. Doom already provides:
+;;   SPC g s  stage hunk        SPC g r  revert hunk
+;;   SPC g S  stage file        SPC g U  unstage file
+;;   SPC g B  blame             SPC g ]  next hunk   SPC g [  previous hunk
 (map! :leader
-      :desc "Toggle file tree" "\\" #'+treemacs/toggle
-      "o p" nil)
+      :desc "Preview hunk"            "g v" #'diff-hl-show-hunk
+      :desc "Diff hunk against index" "g d" #'diff-hl-diff-goto-hunk
+      :desc "Diff hunk against HEAD"  "g H" #'diff-hl-diff-reference-goto-hunk)
+
+;; Gitsigns-style hunk navigation, in addition to Doom's ]d / [d.
+(map! :n "]c" #'+vc-gutter/next-hunk
+      :n "[c" #'+vc-gutter/previous-hunk)
