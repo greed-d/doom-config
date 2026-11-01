@@ -6,7 +6,9 @@ installed packages.
 
 ## Restore on a fresh machine
 
-Requires Emacs 29+ (31.1 was used when this was set up) and Git.
+Requires Emacs 29+ and Git. This config was last verified with Emacs 31.1 and
+Doom core commit `59cdaa3` (2026-10-02). A much newer/older Doom may need small
+config adjustments.
 
 ```bash
 # 1. Install Doom Emacs core
