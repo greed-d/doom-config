@@ -43,5 +43,5 @@ After changing `init.el` or `packages.el`, run `doom sync` locally as usual.
 
 ## Notes
 
-- Keep secrets (tokens, API keys) out of `config.el` — this repo is public.
+- Keep secrets (tokens, API keys) out of `config.el`; this repo is public.
 - Doom core is updated separately with `doom upgrade`; it is not tracked here.
