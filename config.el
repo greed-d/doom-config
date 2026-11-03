@@ -107,6 +107,13 @@
           (reference . " ")))
   (diff-hl-margin-mode +1))
 
+;; Colors for the diff-hl sign column (Catppuccin Mocha palette).
+;; Change these hex values to whatever you prefer.
+(custom-set-faces!
+  '(diff-hl-margin-insert :foreground "#a6e3a1")
+  '(diff-hl-margin-change :foreground "#f9e2af")
+  '(diff-hl-margin-delete :foreground "#f38ba8"))
+
 ;; Hunk actions. Doom already provides:
 ;;   SPC g s  stage hunk        SPC g r  revert hunk
 ;;   SPC g S  stage file        SPC g U  unstage file
@@ -119,3 +126,38 @@
 ;; Gitsigns-style hunk navigation, in addition to Doom's ]d / [d.
 (map! :n "]c" #'+vc-gutter/next-hunk
       :n "[c" #'+vc-gutter/previous-hunk)
+
+;;; Python: ruff + ty
+;; Format with ruff on save (the `format +onsave` module uses apheleia).
+;; `ruff-isort` sorts imports first, then `ruff` formats the buffer.
+(after! apheleia
+  (setf (alist-get 'python-mode apheleia-mode-alist) '(ruff-isort ruff)
+        (alist-get 'python-ts-mode apheleia-mode-alist) '(ruff-isort ruff)))
+
+;; Lint with ruff and type-check with ty, both reported through flycheck.
+;; Ruff is already Doom's preferred checker when `ruff' is on PATH. Chain ty
+;; after it and drop the default mypy step so we do not check types twice.
+(after! flycheck
+  (flycheck-define-checker python-ty
+    "Type-check Python with ty."
+    :command ("ty" "check"
+              "--output-format" "concise"
+              "--no-progress"
+              "--color" "never"
+              source-inplace)
+    :error-patterns
+    ((error
+      (file-name (one-or-more (not (any ":\n"))))
+      ":" line ":" column ": error["
+      (id (one-or-more (not (any "]\n"))))
+      "] " (message) line-end)
+     (warning
+      (file-name (one-or-more (not (any ":\n"))))
+      ":" line ":" column ": warning["
+      (id (one-or-more (not (any "]\n"))))
+      "] " (message) line-end))
+    :working-directory flycheck-python-find-project-root
+    :modes (python-mode python-ts-mode))
+
+  (flycheck-remove-next-checker 'python-ruff '(warning . python-mypy))
+  (flycheck-add-next-checker 'python-ruff 'python-ty))
